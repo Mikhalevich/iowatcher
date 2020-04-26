@@ -15,7 +15,7 @@ func NewWriteWatcher(w io.Writer) *WriteWatcher {
 }
 
 func (ww *WriteWatcher) Write(p []byte) (int, error) {
-	n, err := ww.Write(p)
+	n, err := ww.w.Write(p)
 
 	if n > 0 {
 		ww.Notifier() <- n

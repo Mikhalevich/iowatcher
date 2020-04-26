@@ -23,3 +23,8 @@ func (ww *WriteWatcher) Write(p []byte) (int, error) {
 
 	return n, err
 }
+
+func (ww *WriteWatcher) Close() error {
+	close(ww.Notifier())
+	return nil
+}

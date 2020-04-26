@@ -4,13 +4,13 @@ import "io"
 
 type ReadWatcher struct {
 	notifier
-	r     io.Reader
+	r io.Reader
 }
 
 func NewReadWatcher(r io.Reader) *ReadWatcher {
 	return &ReadWatcher{
 		notifier: *newNotifier(),
-		r:     r,
+		r:        r,
 	}
 }
 
@@ -26,4 +26,9 @@ func (rw *ReadWatcher) Read(p []byte) (int, error) {
 	}
 
 	return n, err
+}
+
+func (rw *ReadWatcher) Close() error {
+	close(rw.Notifier())
+	return nil
 }

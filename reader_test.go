@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestReadBytes(t *testing.T) {
+func TestRead4KBytes(t *testing.T) {
 	var (
 		buf     = bytes.Repeat([]byte("Test"), 1000)
 		watcher = NewReadWatcher(bytes.NewReader(buf))

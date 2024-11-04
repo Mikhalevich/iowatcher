@@ -21,6 +21,7 @@ func (ww *WriteWatcher) Write(p []byte) (int, error) {
 		ww.Notifier() <- n
 	}
 
+	//nolint:wrapcheck
 	return n, err
 }
 

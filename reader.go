@@ -25,6 +25,7 @@ func (rw *ReadWatcher) Read(p []byte) (int, error) {
 		close(rw.Notifier())
 	}
 
+	//nolint:wrapcheck
 	return n, err
 }
 

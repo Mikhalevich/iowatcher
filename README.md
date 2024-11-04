@@ -1,2 +1,2 @@
 # iowatcher
-This library notifies about progress about reading/writing operations
+This library notifies progress about reading/writing operations

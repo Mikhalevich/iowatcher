@@ -15,6 +15,10 @@ build:
 test:
 	go test ./...
 
+.PHONY: bench
+bench:
+	go test -bench=. -benchmem ./...
+
 .PHONY: vendor
 vendor:
 	go mod tidy

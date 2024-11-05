@@ -1,28 +1,30 @@
 package iowatcher
 
-import "io"
+import (
+	"io"
+)
 
 type ReadWatcher struct {
 	notifier
-	r io.Reader
+	origin io.Reader
 }
 
 func NewReadWatcher(r io.Reader) *ReadWatcher {
 	return &ReadWatcher{
 		notifier: *newNotifier(),
-		r:        r,
+		origin:   r,
 	}
 }
 
-func (rw *ReadWatcher) Read(p []byte) (int, error) {
-	n, err := rw.r.Read(p)
+func (r *ReadWatcher) Read(p []byte) (int, error) {
+	n, err := r.origin.Read(p)
 
 	if n > 0 {
-		rw.Notifier() <- n
+		r.Notifier() <- n
 	}
 
 	if err == io.EOF {
-		close(rw.Notifier())
+		close(r.Notifier())
 	}
 
 	//nolint:wrapcheck

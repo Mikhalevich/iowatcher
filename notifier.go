@@ -1,15 +1,17 @@
 package iowatcher
 
+type BytesProcessedCallback func(bytesProcessed int)
+
 type notifier struct {
-	n chan int
+	callback BytesProcessedCallback
 }
 
-func newNotifier() *notifier {
+func newNotifier(callback BytesProcessedCallback) *notifier {
 	return &notifier{
-		n: make(chan int),
+		callback: callback,
 	}
 }
 
-func (n *notifier) Notifier() chan int {
-	return n.n
+func (n *notifier) notify(bytesProcessed int) {
+	n.callback(bytesProcessed)
 }

@@ -3,7 +3,6 @@ package iowatcher
 import (
 	"bytes"
 	"io"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -31,25 +30,14 @@ type readResults struct {
 
 func processRead(initialBytes []byte) (readResults, error) {
 	var (
-		watcher = NewReadWatcher(bytes.NewReader(initialBytes))
-		wg      sync.WaitGroup
 		results readResults
+		watcher = NewReadWatcher(bytes.NewReader(initialBytes), func(bytesProcessed int) {
+			results.ActualBytesNotified += bytesProcessed
+		})
 	)
-
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		for p := range watcher.Notifier() {
-			results.ActualBytesNotified += p
-		}
-	}()
 
 	actualBytesRead, err := io.ReadAll(watcher)
 	results.ActualBytesRead = actualBytesRead
-
-	wg.Wait()
 
 	//nolint:wrapcheck
 	return results, err

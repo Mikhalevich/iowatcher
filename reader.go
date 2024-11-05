@@ -5,13 +5,13 @@ import (
 )
 
 type ReadWatcher struct {
-	notifier
+	*notifier
 	origin io.Reader
 }
 
-func NewReadWatcher(r io.Reader) *ReadWatcher {
+func NewReadWatcher(r io.Reader, callback BytesProcessedCallback) *ReadWatcher {
 	return &ReadWatcher{
-		notifier: *newNotifier(),
+		notifier: newNotifier(callback),
 		origin:   r,
 	}
 }
@@ -20,18 +20,9 @@ func (r *ReadWatcher) Read(p []byte) (int, error) {
 	n, err := r.origin.Read(p)
 
 	if n > 0 {
-		r.Notifier() <- n
-	}
-
-	if err == io.EOF {
-		close(r.Notifier())
+		r.notify(n)
 	}
 
 	//nolint:wrapcheck
 	return n, err
-}
-
-func (r *ReadWatcher) Close() error {
-	close(r.Notifier())
-	return nil
 }

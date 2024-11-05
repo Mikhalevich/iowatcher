@@ -2,7 +2,6 @@ package iowatcher
 
 import (
 	"bytes"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,22 +12,13 @@ func TestWrite4KBytes(t *testing.T) {
 
 	var (
 		buf                     = bytes.Buffer{}
-		watcher                 = NewWriteWatcher(&buf)
 		expectedBytesWrittenLen = 4000
 		expectedBytesWritten    = bytes.Repeat([]byte("Test"), 1000)
-		actualBytesWritten      int
-		wg                      sync.WaitGroup
+		actualBytesNotified     int
+		watcher                 = NewWriteWatcher(&buf, func(bytesProcessed int) {
+			actualBytesNotified += bytesProcessed
+		})
 	)
-
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		for p := range watcher.Notifier() {
-			actualBytesWritten += p
-		}
-	}()
 
 	for range 1000 {
 		n, err := watcher.Write([]byte("Test"))
@@ -37,10 +27,7 @@ func TestWrite4KBytes(t *testing.T) {
 		require.Equal(t, 4, n)
 	}
 
-	watcher.Close()
-	wg.Wait()
-
-	require.Equal(t, expectedBytesWrittenLen, actualBytesWritten)
+	require.Equal(t, expectedBytesWrittenLen, actualBytesNotified)
 	require.Equal(t, expectedBytesWritten, buf.Bytes())
 }
 
@@ -52,28 +39,16 @@ type writeResults struct {
 func processWrite(bytesToWrite []byte, writesCount int) writeResults {
 	var (
 		buf     = bytes.Buffer{}
-		watcher = NewWriteWatcher(&buf)
-		wg      sync.WaitGroup
 		results writeResults
+		watcher = NewWriteWatcher(&buf, func(bytesProcessed int) {
+			results.ActualBytesNotified += bytesProcessed
+		})
 	)
-
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		for p := range watcher.Notifier() {
-			results.ActualBytesNotified += p
-		}
-	}()
 
 	for range writesCount {
 		//nolint:errcheck
 		watcher.Write(bytesToWrite)
 	}
-
-	watcher.Close()
-	wg.Wait()
 
 	results.ActualBytesWrite = buf.Bytes()
 

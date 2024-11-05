@@ -64,9 +64,13 @@ func BenchmarkReader100Bytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		results, err := processRead(initialBytes)
 
+		b.StopTimer()
+
 		require.NoError(b, err)
 		require.Equal(b, initialBytes, results.ActualBytesRead)
 		require.Equal(b, expectedBytesNotified, results.ActualBytesNotified)
+
+		b.StartTimer()
 	}
 }
 
@@ -79,9 +83,13 @@ func BenchmarkReader4KBytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		results, err := processRead(initialBytes)
 
+		b.StopTimer()
+
 		require.NoError(b, err)
 		require.Equal(b, initialBytes, results.ActualBytesRead)
 		require.Equal(b, expectedBytesNotified, results.ActualBytesNotified)
+
+		b.StartTimer()
 	}
 }
 
@@ -94,8 +102,12 @@ func BenchmarkReader64KBytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		results, err := processRead(initialBytes)
 
+		b.StopTimer()
+
 		require.NoError(b, err)
 		require.Equal(b, initialBytes, results.ActualBytesRead)
 		require.Equal(b, expectedBytesNotified, results.ActualBytesNotified)
+
+		b.StartTimer()
 	}
 }

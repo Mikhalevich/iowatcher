@@ -51,6 +51,7 @@ func processRead(initialBytes []byte) (readResults, error) {
 
 	wg.Wait()
 
+	//nolint:wrapcheck
 	return results, err
 }
 

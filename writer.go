@@ -4,28 +4,28 @@ import "io"
 
 type WriteWatcher struct {
 	notifier
-	w io.Writer
+	origin io.Writer
 }
 
 func NewWriteWatcher(w io.Writer) *WriteWatcher {
 	return &WriteWatcher{
 		notifier: *newNotifier(),
-		w:        w,
+		origin:   w,
 	}
 }
 
-func (ww *WriteWatcher) Write(p []byte) (int, error) {
-	n, err := ww.w.Write(p)
+func (w *WriteWatcher) Write(p []byte) (int, error) {
+	n, err := w.origin.Write(p)
 
 	if n > 0 {
-		ww.Notifier() <- n
+		w.Notifier() <- n
 	}
 
 	//nolint:wrapcheck
 	return n, err
 }
 
-func (ww *WriteWatcher) Close() error {
-	close(ww.Notifier())
+func (w *WriteWatcher) Close() error {
+	close(w.Notifier())
 	return nil
 }

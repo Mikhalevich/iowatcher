@@ -31,7 +31,7 @@ func (r *ReadWatcher) Read(p []byte) (int, error) {
 	return n, err
 }
 
-func (rw *ReadWatcher) Close() error {
-	close(rw.Notifier())
+func (r *ReadWatcher) Close() error {
+	close(r.Notifier())
 	return nil
 }

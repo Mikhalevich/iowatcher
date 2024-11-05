@@ -3,28 +3,24 @@ package iowatcher
 import "io"
 
 type WriteWatcher struct {
-	notifier
-	w io.Writer
+	*notifier
+	origin io.Writer
 }
 
-func NewWriteWatcher(w io.Writer) *WriteWatcher {
+func NewWriteWatcher(w io.Writer, callback BytesProcessedCallback) *WriteWatcher {
 	return &WriteWatcher{
-		notifier: *newNotifier(),
-		w:        w,
+		notifier: newNotifier(callback),
+		origin:   w,
 	}
 }
 
-func (ww *WriteWatcher) Write(p []byte) (int, error) {
-	n, err := ww.w.Write(p)
+func (w *WriteWatcher) Write(p []byte) (int, error) {
+	n, err := w.origin.Write(p)
 
 	if n > 0 {
-		ww.Notifier() <- n
+		w.notify(n)
 	}
 
+	//nolint:wrapcheck
 	return n, err
-}
-
-func (ww *WriteWatcher) Close() error {
-	close(ww.Notifier())
-	return nil
 }
